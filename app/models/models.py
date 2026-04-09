@@ -35,6 +35,7 @@ class Produto(Base):
     descricao = Column(Text, nullable=True)
     preco = Column(Float, nullable=False)
     estoque = Column(Integer, default=0)
+    imagem = Column(String(255), nullable=True)  # ← campo novo
     categoria_id = Column(Integer, ForeignKey("categorias.id"), nullable=True)
     criado_em = Column(DateTime, default=datetime.utcnow)
     atualizado_em = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
