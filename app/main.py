@@ -6,6 +6,7 @@ from app.routers import categorias, produtos, clientes, pedidos
 from app.auth.router import router as auth_router
 from app.routers.upload import router as upload_router
 from app.routers.pagamentos import router as pagamentos_router
+from app.routers.enderecos import router as enderecos_router
 
 # Importa todos os models para criar as tabelas
 import app.models.models  # noqa
@@ -16,8 +17,8 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="E-commerce API",
-    description="API REST completa para e-commerce com FastAPI + MySQL + JWT Auth + Upload + MercadoPago",
-    version="4.0.0",
+    description="API REST completa para e-commerce com FastAPI + MySQL + JWT Auth + Upload + MercadoPago + Frete",
+    version="5.0.0",
 )
 
 app.add_middleware(
@@ -38,6 +39,7 @@ app.include_router(clientes.router)
 app.include_router(pedidos.router)
 app.include_router(upload_router)
 app.include_router(pagamentos_router)
+app.include_router(enderecos_router)
 
 
 @app.get("/", tags=["Root"])
