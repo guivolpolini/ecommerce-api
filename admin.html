@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — E-commerce</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c26;
+    --border: #2a2a3a;
+    --accent: #7c6aff;
+    --accent2: #ff6a6a;
+    --accent3: #6affd4;
+    --text: #e8e8f0;
+    --text2: #8888aa;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 240px; min-height: 100vh; background: var(--surface);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; z-index: 100;
+  }
+  .logo {
+    padding: 28px 24px 20px; border-bottom: 1px solid var(--border);
+    font-family: 'Space Mono', monospace; font-size: 13px; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase;
+  }
+  .logo span { display: block; font-size: 10px; color: var(--text2); margin-top: 2px; letter-spacing: 1px; }
+  .nav { padding: 16px 12px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+    border-radius: 8px; cursor: pointer; color: var(--text2); font-size: 14px;
+    font-weight: 500; transition: all 0.2s; margin-bottom: 2px; border: none;
+    background: none; width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(124,106,255,0.15); color: var(--accent); }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-section { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--text2);
+    letter-spacing: 2px; text-transform: uppercase; padding: 16px 12px 6px; }
+  .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text2); }
+
+  /* MAIN */
+  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    padding: 20px 32px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface); position: sticky; top: 0; z-index: 50;
+  }
+  .topbar h1 { font-size: 18px; font-weight: 600; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .badge { background: rgba(124,106,255,0.2); color: var(--accent); font-size: 11px;
+    padding: 3px 8px; border-radius: 20px; font-family: 'Space Mono', monospace; }
+  .content { padding: 32px; flex: 1; }
+
+  /* CARDS */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px; position: relative; overflow: hidden;
+  }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0;
+    height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent3)); }
+  .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase;
+    letter-spacing: 1px; font-family: 'Space Mono', monospace; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 600; font-family: 'Space Mono', monospace; }
+  .stat-sub { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+  /* TABLES */
+  .section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .section-header { padding: 18px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; }
+  .section-title { font-size: 14px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th { padding: 12px 24px; text-align: left; font-size: 11px; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 1px; font-family: 'Space Mono', monospace;
+    border-bottom: 1px solid var(--border); font-weight: 400; }
+  td { padding: 14px 24px; font-size: 14px; border-bottom: 1px solid rgba(42,42,58,0.5); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+
+  /* BUTTONS */
+  .btn {
+    padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer;
+    font-size: 13px; font-weight: 500; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #6b59ee; transform: translateY(-1px); }
+  .btn-danger { background: rgba(248,113,113,0.15); color: var(--danger); }
+  .btn-danger:hover { background: rgba(248,113,113,0.25); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-outline { background: transparent; color: var(--text2); border: 1px solid var(--border); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* STATUS BADGES */
+  .status { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .status-pendente { background: rgba(251,191,36,0.15); color: var(--warning); }
+  .status-pago { background: rgba(74,222,128,0.15); color: var(--success); }
+  .status-enviado { background: rgba(124,106,255,0.15); color: var(--accent); }
+  .status-entregue { background: rgba(106,255,212,0.15); color: var(--accent3); }
+  .status-cancelado { background: rgba(248,113,113,0.15); color: var(--danger); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+    display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; }
+  .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-size: 16px; font-weight: 600; }
+  .modal-body { padding: 24px; }
+  .modal-footer { padding: 16px 24px; border-top: 1px solid var(--border);
+    display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* FORM */
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px;
+    text-transform: uppercase; letter-spacing: 1px; font-family: 'Space Mono', monospace; }
+  .form-input {
+    width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s; outline: none;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-select { width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text); font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* TOAST */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+  .toast { padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500;
+    animation: slideIn 0.3s ease; display: flex; align-items: center; gap: 8px; min-width: 240px; }
+  .toast-success { background: rgba(74,222,128,0.15); border: 1px solid rgba(74,222,128,0.3); color: var(--success); }
+  .toast-error { background: rgba(248,113,113,0.15); border: 1px solid rgba(248,113,113,0.3); color: var(--danger); }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+  /* LOADING */
+  .loading { text-align: center; padding: 40px; color: var(--text2); font-size: 14px; }
+  .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin-right: 8px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 48px; color: var(--text2); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* SEARCH */
+  .search-bar { position: relative; }
+  .search-bar input { padding-left: 36px; }
+  .search-bar::before { content: '🔍'; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; }
+
+  /* PAGE */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* IMAGE */
+  .product-img { width: 36px; height: 36px; border-radius: 6px; object-fit: cover; background: var(--surface2); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">⚡ E-COMMERCE<span>Admin Panel v5.0</span></div>
+  <nav class="nav">
+    <div class="nav-section">Principal</div>
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">📊</span> Dashboard
+    </button>
+    <div class="nav-section">Catálogo</div>
+    <button class="nav-item" onclick="showPage('categorias')">
+      <span class="icon">🏷️</span> Categorias
+    </button>
+    <button class="nav-item" onclick="showPage('produtos')">
+      <span class="icon">📦</span> Produtos
+    </button>
+    <div class="nav-section">Vendas</div>
+    <button class="nav-item" onclick="showPage('clientes')">
+      <span class="icon">👥</span> Clientes
+    </button>
+    <button class="nav-item" onclick="showPage('pedidos')">
+      <span class="icon">🛒</span> Pedidos
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    🟢 API conectada em<br><strong>localhost:8000</strong>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <h1 id="page-title">Dashboard</h1>
+    <div class="topbar-actions">
+      <span class="badge" id="topbar-badge">VISÃO GERAL</span>
+      <button class="btn btn-outline btn-sm" onclick="location.reload()">↻ Atualizar</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Produtos</div>
+          <div class="stat-value" id="stat-produtos">—</div>
+          <div class="stat-sub">cadastrados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Clientes</div>
+          <div class="stat-value" id="stat-clientes">—</div>
+          <div class="stat-sub">cadastrados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pedidos</div>
+          <div class="stat-value" id="stat-pedidos">—</div>
+          <div class="stat-sub">no total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Categorias</div>
+          <div class="stat-value" id="stat-categorias">—</div>
+          <div class="stat-sub">ativas</div>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">🛒 Últimos Pedidos</span>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Cliente</th><th>Total</th><th>Status</th><th>Data</th></tr></thead>
+          <tbody id="dashboard-pedidos"><tr><td colspan="5" class="loading"><span class="spinner"></span>Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CATEGORIAS -->
+    <div id="page-categorias" class="page">
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">🏷️ Categorias</span>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-categoria')">+ Nova Categoria</button>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Nome</th><th>Descrição</th><th>Criado em</th><th>Ações</th></tr></thead>
+          <tbody id="table-categorias"><tr><td colspan="5" class="loading"><span class="spinner"></span>Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRODUTOS -->
+    <div id="page-produtos" class="page">
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">📦 Produtos</span>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-produto')">+ Novo Produto</button>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Nome</th><th>Preço</th><th>Estoque</th><th>Categoria</th><th>Ações</th></tr></thead>
+          <tbody id="table-produtos"><tr><td colspan="6" class="loading"><span class="spinner"></span>Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CLIENTES -->
+    <div id="page-clientes" class="page">
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">👥 Clientes</span>
+          <button class="btn btn-primary btn-sm" onclick="openModal('modal-cliente')">+ Novo Cliente</button>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Telefone</th><th>Cadastrado em</th><th>Ações</th></tr></thead>
+          <tbody id="table-clientes"><tr><td colspan="6" class="loading"><span class="spinner"></span>Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PEDIDOS -->
+    <div id="page-pedidos" class="page">
+      <div class="section">
+        <div class="section-header">
+          <span class="section-title">🛒 Pedidos</span>
+          <select class="form-select" style="width:auto;padding:6px 12px;" onchange="filtrarPedidos(this.value)">
+            <option value="">Todos os status</option>
+            <option value="pendente">Pendente</option>
+            <option value="pago">Pago</option>
+            <option value="enviado">Enviado</option>
+            <option value="entregue">Entregue</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>ID</th><th>Cliente</th><th>Total</th><th>Status</th><th>Data</th><th>Ações</th></tr></thead>
+          <tbody id="table-pedidos"><tr><td colspan="6" class="loading"><span class="spinner"></span>Carregando...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODALS -->
+<!-- Modal Categoria -->
+<div class="modal-overlay" id="modal-categoria">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Nova Categoria</span>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('modal-categoria')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input class="form-input" id="cat-nome" placeholder="Ex: Eletrônicos">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <input class="form-input" id="cat-descricao" placeholder="Descrição opcional">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-categoria')">Cancelar</button>
+      <button class="btn btn-primary" onclick="criarCategoria()">Criar Categoria</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Produto -->
+<div class="modal-overlay" id="modal-produto">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Novo Produto</span>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('modal-produto')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Nome</label>
+        <input class="form-input" id="prod-nome" placeholder="Nome do produto">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrição</label>
+        <input class="form-input" id="prod-descricao" placeholder="Descrição opcional">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Preço (R$)</label>
+          <input class="form-input" id="prod-preco" type="number" step="0.01" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Estoque</label>
+          <input class="form-input" id="prod-estoque" type="number" placeholder="0">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <select class="form-select" id="prod-categoria"></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-produto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="criarProduto()">Criar Produto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cliente -->
+<div class="modal-overlay" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Novo Cliente</span>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('modal-cliente')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome</label>
+          <input class="form-input" id="cli-nome" placeholder="Nome completo">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="cli-email" type="email" placeholder="email@exemplo.com">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input class="form-input" id="cli-telefone" placeholder="(11) 99999-9999">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Endereço</label>
+          <input class="form-input" id="cli-endereco" placeholder="Rua, número">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="criarCliente()">Criar Cliente</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Status Pedido -->
+<div class="modal-overlay" id="modal-status">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Atualizar Status do Pedido</span>
+      <button class="btn btn-outline btn-sm" onclick="closeModal('modal-status')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="status-pedido-id">
+      <div class="form-group">
+        <label class="form-label">Novo Status</label>
+        <select class="form-select" id="status-novo">
+          <option value="pendente">Pendente</option>
+          <option value="pago">Pago</option>
+          <option value="enviado">Enviado</option>
+          <option value="entregue">Entregue</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modal-status')">Cancelar</button>
+      <button class="btn btn-primary" onclick="atualizarStatus()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+const API = 'http://localhost:8000';
+
+// NAVIGATION
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  event.currentTarget.classList.add('active');
+  const titles = { dashboard: 'Dashboard', categorias: 'Categorias', produtos: 'Produtos', clientes: 'Clientes', pedidos: 'Pedidos' };
+  const badges = { dashboard: 'VISÃO GERAL', categorias: 'CATÁLOGO', produtos: 'CATÁLOGO', clientes: 'VENDAS', pedidos: 'VENDAS' };
+  document.getElementById('page-title').textContent = titles[page];
+  document.getElementById('topbar-badge').textContent = badges[page];
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'categorias') loadCategorias();
+  if (page === 'produtos') loadProdutos();
+  if (page === 'clientes') loadClientes();
+  if (page === 'pedidos') loadPedidos();
+}
+
+// MODAL
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+  if (id === 'modal-produto') loadCategoriasSelect();
+}
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// TOAST
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast toast-${type}`;
+  el.innerHTML = (type === 'success' ? '✅ ' : '❌ ') + msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(() => el.remove(), 3500);
+}
+
+// FORMAT
+function fmtDate(d) { return new Date(d).toLocaleDateString('pt-BR'); }
+function fmtMoney(v) { return 'R$ ' + Number(v).toFixed(2).replace('.', ','); }
+function statusBadge(s) { return `<span class="status status-${s}">${s}</span>`; }
+
+// API FETCH
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  return res.json();
+}
+
+// DASHBOARD
+async function loadDashboard() {
+  const [produtos, clientes, pedidos, categorias] = await Promise.all([
+    api('/produtos/'), api('/clientes/'), api('/pedidos/'), api('/categorias/')
+  ]);
+  document.getElementById('stat-produtos').textContent = produtos.length;
+  document.getElementById('stat-clientes').textContent = clientes.length;
+  document.getElementById('stat-pedidos').textContent = pedidos.length;
+  document.getElementById('stat-categorias').textContent = categorias.length;
+  const tbody = document.getElementById('dashboard-pedidos');
+  const ultimos = pedidos.slice(0, 8);
+  if (!ultimos.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty"><div class="empty-icon">🛒</div>Nenhum pedido</td></tr>'; return; }
+  tbody.innerHTML = ultimos.map(p => `
+    <tr>
+      <td><span style="font-family:Space Mono;font-size:12px;color:var(--text2)">#${p.id}</span></td>
+      <td>${p.cliente?.nome || '—'}</td>
+      <td>${fmtMoney(p.total)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td>${fmtDate(p.criado_em)}</td>
+    </tr>`).join('');
+}
+
+// CATEGORIAS
+async function loadCategorias() {
+  const data = await api('/categorias/');
+  const tbody = document.getElementById('table-categorias');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty"><div class="empty-icon">🏷️</div>Nenhuma categoria</td></tr>'; return; }
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td><span style="font-family:Space Mono;font-size:12px;color:var(--text2)">#${c.id}</span></td>
+      <td><strong>${c.nome}</strong></td>
+      <td style="color:var(--text2)">${c.descricao || '—'}</td>
+      <td style="color:var(--text2)">${fmtDate(c.criado_em)}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deletarCategoria(${c.id})">🗑️ Deletar</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function criarCategoria() {
+  const nome = document.getElementById('cat-nome').value.trim();
+  if (!nome) { toast('Nome é obrigatório', 'error'); return; }
+  const res = await api('/categorias/', { method: 'POST', body: JSON.stringify({ nome, descricao: document.getElementById('cat-descricao').value }) });
+  if (res.id) { toast('Categoria criada!'); closeModal('modal-categoria'); loadCategorias(); document.getElementById('cat-nome').value = ''; document.getElementById('cat-descricao').value = ''; }
+  else toast('Erro ao criar: ' + (res.detail || 'erro'), 'error');
+}
+
+async function deletarCategoria(id) {
+  if (!confirm('Deletar esta categoria?')) return;
+  await fetch(API + '/categorias/' + id, { method: 'DELETE' });
+  toast('Categoria deletada!'); loadCategorias();
+}
+
+// PRODUTOS
+async function loadProdutos() {
+  const data = await api('/produtos/');
+  const tbody = document.getElementById('table-produtos');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty"><div class="empty-icon">📦</div>Nenhum produto</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><span style="font-family:Space Mono;font-size:12px;color:var(--text2)">#${p.id}</span></td>
+      <td><strong>${p.nome}</strong></td>
+      <td>${fmtMoney(p.preco)}</td>
+      <td><span style="color:${p.estoque < 5 ? 'var(--danger)' : 'var(--success)'}">${p.estoque}</span></td>
+      <td style="color:var(--text2)">${p.categoria?.nome || '—'}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deletarProduto(${p.id})">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function loadCategoriasSelect() {
+  const data = await api('/categorias/');
+  const sel = document.getElementById('prod-categoria');
+  sel.innerHTML = '<option value="">Sem categoria</option>' + data.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+}
+
+async function criarProduto() {
+  const nome = document.getElementById('prod-nome').value.trim();
+  const preco = parseFloat(document.getElementById('prod-preco').value);
+  const estoque = parseInt(document.getElementById('prod-estoque').value) || 0;
+  const categoria_id = document.getElementById('prod-categoria').value || null;
+  if (!nome || !preco) { toast('Nome e preço são obrigatórios', 'error'); return; }
+  const res = await api('/produtos/', { method: 'POST', body: JSON.stringify({ nome, descricao: document.getElementById('prod-descricao').value, preco, estoque, categoria_id: categoria_id ? parseInt(categoria_id) : null }) });
+  if (res.id) { toast('Produto criado!'); closeModal('modal-produto'); loadProdutos(); }
+  else toast('Erro: ' + (res.detail || 'erro'), 'error');
+}
+
+async function deletarProduto(id) {
+  if (!confirm('Deletar este produto?')) return;
+  await fetch(API + '/produtos/' + id, { method: 'DELETE' });
+  toast('Produto deletado!'); loadProdutos();
+}
+
+// CLIENTES
+async function loadClientes() {
+  const data = await api('/clientes/');
+  const tbody = document.getElementById('table-clientes');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty"><div class="empty-icon">👥</div>Nenhum cliente</td></tr>'; return; }
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td><span style="font-family:Space Mono;font-size:12px;color:var(--text2)">#${c.id}</span></td>
+      <td><strong>${c.nome}</strong></td>
+      <td style="color:var(--text2)">${c.email}</td>
+      <td style="color:var(--text2)">${c.telefone || '—'}</td>
+      <td style="color:var(--text2)">${fmtDate(c.criado_em)}</td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deletarCliente(${c.id})">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function criarCliente() {
+  const nome = document.getElementById('cli-nome').value.trim();
+  const email = document.getElementById('cli-email').value.trim();
+  if (!nome || !email) { toast('Nome e email são obrigatórios', 'error'); return; }
+  const res = await api('/clientes/', { method: 'POST', body: JSON.stringify({ nome, email, telefone: document.getElementById('cli-telefone').value, endereco: document.getElementById('cli-endereco').value }) });
+  if (res.id) { toast('Cliente criado!'); closeModal('modal-cliente'); loadClientes(); }
+  else toast('Erro: ' + (res.detail || 'erro'), 'error');
+}
+
+async function deletarCliente(id) {
+  if (!confirm('Deletar este cliente?')) return;
+  await fetch(API + '/clientes/' + id, { method: 'DELETE' });
+  toast('Cliente deletado!'); loadClientes();
+}
+
+// PEDIDOS
+async function loadPedidos(status = '') {
+  const url = status ? `/pedidos/?status=${status}` : '/pedidos/';
+  const data = await api(url);
+  const tbody = document.getElementById('table-pedidos');
+  if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty"><div class="empty-icon">🛒</div>Nenhum pedido</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td><span style="font-family:Space Mono;font-size:12px;color:var(--text2)">#${p.id}</span></td>
+      <td>${p.cliente?.nome || '—'}</td>
+      <td>${fmtMoney(p.total)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td style="color:var(--text2)">${fmtDate(p.criado_em)}</td>
+      <td style="display:flex;gap:6px">
+        <button class="btn btn-outline btn-sm" onclick="abrirModalStatus(${p.id}, '${p.status}')">✏️ Status</button>
+        <button class="btn btn-danger btn-sm" onclick="deletarPedido(${p.id})">🗑️</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filtrarPedidos(status) { loadPedidos(status); }
+
+function abrirModalStatus(id, statusAtual) {
+  document.getElementById('status-pedido-id').value = id;
+  document.getElementById('status-novo').value = statusAtual;
+  openModal('modal-status');
+}
+
+async function atualizarStatus() {
+  const id = document.getElementById('status-pedido-id').value;
+  const status = document.getElementById('status-novo').value;
+  const res = await api(`/pedidos/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) });
+  if (res.id) { toast('Status atualizado!'); closeModal('modal-status'); loadPedidos(); }
+  else toast('Erro: ' + (res.detail || 'erro'), 'error');
+}
+
+async function deletarPedido(id) {
+  if (!confirm('Deletar este pedido?')) return;
+  await fetch(API + '/pedidos/' + id, { method: 'DELETE' });
+  toast('Pedido deletado!'); loadPedidos();
+}
+
+// INIT
+loadDashboard();
+</script>
+</body>
+</html>

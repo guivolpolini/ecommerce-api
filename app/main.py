@@ -7,6 +7,7 @@ from app.auth.router import router as auth_router
 from app.routers.upload import router as upload_router
 from app.routers.pagamentos import router as pagamentos_router
 from app.routers.enderecos import router as enderecos_router
+from fastapi.responses import FileResponse
 
 # Importa todos os models para criar as tabelas
 import app.models.models  # noqa
@@ -49,3 +50,8 @@ def root():
         "docs": "/docs",
         "redoc": "/redoc",
     }
+
+
+@app.get("/admin")
+def admin():
+    return FileResponse("admin.html")
