@@ -170,5 +170,3 @@ MERCADO_PAGO_ACCESS_TOKEN=seu_token
 
 Desenvolvido por **Guilherme Volpolini**
 
----
-
