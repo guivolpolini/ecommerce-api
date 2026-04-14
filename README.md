@@ -1,169 +1,174 @@
-# 🛒 E-commerce API — FastAPI + MySQL
+# 🛒 E-Commerce Full Stack
 
-API REST completa para e-commerce com autenticação, controle de estoque e gestão de pedidos.
+Projeto completo de e-commerce desenvolvido com arquitetura moderna, incluindo backend robusto, autenticação segura, pagamentos integrados e painel administrativo.
 
 ---
 
-## 📁 Estrutura do Projeto
+## 🚀 Tecnologias utilizadas
 
-```
-ecommerce-api/
-├── app/
-│   ├── main.py            # Entrada da aplicação
-│   ├── database.py        # Configuração do banco e sessão
+### 🔙 Backend
+- FastAPI
+- MySQL
+- SQLAlchemy
+- JWT (JSON Web Token)
+- Pydantic
+
+### 🎨 Frontend
+- React / Next.js
+- TypeScript
+- CSS / Tailwind
+
+### 💳 Integrações
+- MercadoPago API
+
+---
+
+## ⚙️ Funcionalidades
+
+### 🔐 Autenticação
+- Cadastro e login de usuários
+- Autenticação via JWT
+- Proteção de rotas privadas
+
+### 🛍️ Produtos
+- Listagem de produtos
+- Página de detalhes
+- Upload de imagens
+- Controle de estoque
+
+### 🛒 Carrinho
+- Adicionar/remover produtos
+- Atualização dinâmica de quantidade
+
+### 📦 Endereços e Frete
+- Cadastro de múltiplos endereços
+- Cálculo de frete
+- Seleção de endereço na compra
+
+### 💳 Pagamentos
+- Integração com MercadoPago
+- Checkout seguro
+- Confirmação de pagamento
+
+### 🧑‍💼 Painel Administrativo
+- CRUD de produtos
+- Gerenciamento de pedidos
+- Controle de usuários
+- Upload e gerenciamento de imagens
+
+---
+
+## 🧱 Estrutura do Projeto
+
+```bash
+ecommerce/
+│
+├── backend/
+│   ├── app/
 │   ├── models/
-│   │   └── models.py      # Modelos SQLAlchemy (tabelas)
+│   ├── routes/
 │   ├── schemas/
-│   │   └── schemas.py     # Schemas Pydantic (validação)
-│   └── routers/
-│       ├── categorias.py  # CRUD de categorias
-│       ├── produtos.py    # CRUD de produtos
-│       ├── clientes.py    # CRUD de clientes
-│       └── pedidos.py     # CRUD de pedidos
-├── requirements.txt
-├── .env.example
+│   └── main.py
+│
+├── frontend/
+│   ├── components/
+│   ├── pages/
+│   ├── services/
+│   └── styles/
+│
 └── README.md
 ```
 
 ---
 
-## ⚙️ Instalação e Configuração
+## 🔑 Autenticação (JWT)
 
-### 1. Clone e entre na pasta
+A autenticação é baseada em tokens JWT:
+
+- Login retorna um token
+- Token deve ser enviado no header:
+
 ```bash
-cd ecommerce-api
+Authorization: Bearer SEU_TOKEN
 ```
 
-### 2. Crie e ative o ambiente virtual
+---
+
+## 🖼️ Upload de Imagens
+
+- Upload via API
+- Armazenamento local ou cloud
+- Associação com produtos
+
+---
+
+## 💳 Integração com MercadoPago
+
+- Criação de preferência de pagamento
+- Redirecionamento para checkout
+- Webhook para confirmação automática
+
+---
+
+## 📦 Sistema de Frete
+
+- Baseado em endereço do usuário
+- Possibilidade de integração com APIs externas (Correios, etc.)
+
+---
+
+## ▶️ Como rodar o projeto
+
+### 🔧 Backend
+
 ```bash
-python -m venv venv
-
-# Linux/Mac
-source venv/bin/activate
-
-# Windows
-venv\Scripts\activate
-```
-
-### 3. Instale as dependências
-```bash
+cd backend
 pip install -r requirements.txt
-```
-
-### 4. Configure o banco de dados MySQL
-
-Crie o banco no MySQL:
-```sql
-CREATE DATABASE ecommerce_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-### 5. Configure o arquivo .env
-```bash
-cp .env.example .env
-# Edite o .env com suas credenciais MySQL
-```
-
-Exemplo de `.env`:
-```
-DB_HOST=localhost
-DB_PORT=3306
-DB_NAME=ecommerce_db
-DB_USER=root
-DB_PASSWORD=sua_senha
-```
-
-### 6. Inicie o servidor
-```bash
 uvicorn app.main:app --reload
 ```
 
-As tabelas serão criadas automaticamente no primeiro start.
-
 ---
 
-## 📚 Endpoints
+### 💻 Frontend
 
-### Acesse a documentação interativa
-- **Swagger UI:** http://localhost:8000/docs
-- **ReDoc:** http://localhost:8000/redoc
-
-### Categorias `GET POST PUT DELETE /categorias`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | /categorias | Listar todas |
-| GET | /categorias/{id} | Buscar por ID |
-| POST | /categorias | Criar |
-| PUT | /categorias/{id} | Atualizar |
-| DELETE | /categorias/{id} | Deletar |
-
-### Produtos `GET POST PUT DELETE /produtos`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | /produtos?nome=X&categoria_id=1 | Listar com filtros |
-| GET | /produtos/{id} | Buscar por ID |
-| POST | /produtos | Criar |
-| PUT | /produtos/{id} | Atualizar |
-| DELETE | /produtos/{id} | Deletar |
-
-### Clientes `GET POST PUT DELETE /clientes`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | /clientes | Listar todos |
-| GET | /clientes/{id} | Buscar por ID |
-| POST | /clientes | Criar |
-| PUT | /clientes/{id} | Atualizar |
-| DELETE | /clientes/{id} | Deletar |
-
-### Pedidos `GET POST PATCH DELETE /pedidos`
-| Método | Rota | Descrição |
-|--------|------|-----------|
-| GET | /pedidos?cliente_id=1&status=pago | Listar com filtros |
-| GET | /pedidos/{id} | Buscar por ID |
-| POST | /pedidos | Criar pedido |
-| PATCH | /pedidos/{id}/status | Atualizar status |
-| DELETE | /pedidos/{id} | Deletar |
-
-### Status dos Pedidos
-`pendente` → `pago` → `enviado` → `entregue` / `cancelado`
-
----
-
-## 🧪 Exemplo de Uso
-
-### Criar um produto
 ```bash
-curl -X POST http://localhost:8000/produtos \
-  -H "Content-Type: application/json" \
-  -d '{"nome": "Camiseta", "preco": 49.90, "estoque": 100}'
-```
-
-### Criar um pedido
-```bash
-curl -X POST http://localhost:8000/pedidos \
-  -H "Content-Type: application/json" \
-  -d '{
-    "cliente_id": 1,
-    "itens": [
-      {"produto_id": 1, "quantidade": 2}
-    ]
-  }'
-```
-
-### Atualizar status do pedido
-```bash
-curl -X PATCH http://localhost:8000/pedidos/1/status \
-  -H "Content-Type: application/json" \
-  -d '{"status": "pago"}'
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
 
-## 🔧 Funcionalidades
+## 🧪 Variáveis de Ambiente
 
-- ✅ CRUD completo para Categorias, Produtos, Clientes e Pedidos
-- ✅ Controle automático de estoque ao criar/cancelar pedidos
-- ✅ Filtros por nome, categoria e status
-- ✅ Validação de dados com Pydantic
-- ✅ Documentação automática (Swagger + ReDoc)
-- ✅ Suporte a CORS
-- ✅ Relacionamentos entre tabelas com SQLAlchemy
+Crie um arquivo `.env`:
+
+```env
+# Backend
+DATABASE_URL=mysql://user:password@localhost/db
+SECRET_KEY=sua_chave_secreta
+ALGORITHM=HS256
+
+# MercadoPago
+MERCADO_PAGO_ACCESS_TOKEN=seu_token
+```
+
+---
+
+
+## 📚 Aprendizados
+
+- Construção de API REST com FastAPI
+- Autenticação segura com JWT
+- Integração com APIs externas
+- Manipulação de arquivos (upload)
+- Desenvolvimento full stack moderno
+
+---
+
+## 👨‍💻 Autor
+
+Desenvolvido por **Guilherme Volpolini**
+
+---
+
